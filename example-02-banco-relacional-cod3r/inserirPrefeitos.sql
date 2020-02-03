@@ -8,6 +8,7 @@ VALUES
 INSERT INTO prefeitos
     (nome, cidade_id)
 VALUES
-("Number One", null)    
+("Number 1", null)    
 
+SELECT * FROM `cidades`
 SELECT * FROM prefeitos
