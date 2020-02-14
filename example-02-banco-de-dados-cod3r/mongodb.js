@@ -106,3 +106,80 @@ db.estados.remove({populacao: {$lt: 955000}})
 
 
 
+{
+    "_id" : ObjectId("5e3d8cb3bc1807a50a001808"),
+    "nome" : "Acre",
+    "sigla" : "AC",
+    "regiao" : "Norte"
+}
+{
+    "_id" : ObjectId("5e3d9487bc1807a50a00180f"),
+    "nome" : "São Paulo",
+    "sigla" : "SP",
+    "regiao" : "Sudeste",
+    "cidades" : [
+            {
+                    "_id" : ObjectId("5e3d9487bc1807a50a00180c"),
+                    "nome" : "Campinas",
+                    "area" : 795.7,
+                    "prefeito" : "Jonas Donizette",
+                    "populacao" : 1081000
+            },
+            {
+                    "_id" : ObjectId("5e3d9487bc1807a50a00180d"),
+                    "name" : "guarulhos",
+                    "populacao" : 132584
+            },
+            {
+                    "_id" : ObjectId("5e3d9487bc1807a50a00180e"),
+                    "name" : "Sorocaba",
+                    "distanciaCapital" : 87,
+                    "populacao" : 64441
+            },
+            [
+                    {
+                            "nome" : "São Paulo",
+                            "populacao" : 100
+                    }
+            ],
+            {
+                    "nome" : "São Paulo",
+                    "populacao" : 100
+            },
+            {
+                    "nome" : "São Paulo",
+                    "populacao" : 100,
+                    "_id" : ObjectId("5e3dcc5eb2780f9efed87aa8")
+            }
+    ],
+    "populacao" : 40555000
+}
+
+db.empresas.aggregate([
+    {$match: {name: "Nubank"}},
+    {$lookup:{
+        from: "estados",
+        localField: "estadoId",
+        foreignField: "_id",
+        as: "estado"
+    }},
+    {$unwind: "$estado"}
+
+]).pretty()
+
+db.empresas.aggregate([
+    {$match: {name: "Imperio"}},
+    {$lookup:{
+        from: "estados",
+        localField: "cidadeId",
+        foreignField: "cidades._id",
+        as: "estado"
+    }},
+    {$unwind: "$estado"},
+    {$unwind: "$estado.cidades"},
+    {$addFields: {mesmaCidade: {$cmp: ["$estado.cidades._id", "$cidadeId"]}}},
+    {$match: {mesmaCidade: 0}}
+
+]).pretty()
+
+//    {$project: {"estado.cidades": 1}}
